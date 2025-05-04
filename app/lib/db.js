@@ -48,14 +48,21 @@ export const clientPromise = cached.clientPromise;
  * Returns a connected { client, db } pair, caching both.
  * @returns {Promise<{ client: MongoClient, db: import('mongodb').Db }>}
  */
+let cachedClient = null;
+let cachedDb = null;
+
 export async function connectToDB() {
-  // Ensure the client is connected
-  const client = cached.client || (await cached.clientPromise);
-  // Return cached db or create & cache
-  if (!cached.db) {
-    cached.db = dbName ? client.db(dbName) : client.db();
+  if (cachedClient && cachedDb) {
+    return { client: cachedClient, db: cachedDb };
   }
-  return { client, db: cached.db };
+
+  const client = await MongoClient.connect(uri);
+  const db = client.db(dbName);
+  
+  cachedClient = client;
+  cachedDb = db;
+
+  return { client, db };
 }
 
 // Optional: Graceful shutdown in server environments

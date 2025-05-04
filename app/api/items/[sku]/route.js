@@ -3,6 +3,26 @@ import { NextResponse } from 'next/server';
 import { connectToDB } from '@/app/lib/db';
 import { validateItem } from '@/app/models/item';
 import { withStoreAuth } from '@/app/middleware/withauth';
+// app/api/items/[sku]/route.js
+
+export async function GET(req) {
+  const authResponse = await withStoreAuth(req);
+  if (authResponse.status !== 200) return authResponse;
+
+  try {
+    const { db } = await connectToDB();
+    const sku = req.nextUrl.pathname.split('/').pop();
+    
+    const item = await db.collection('items').findOne({ sku });
+    
+    return NextResponse.json(item);
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to fetch item' },
+      { status: 500 }
+    );
+  }
+}
 
 export const DELETE = withStoreAuth(async (req) => {
   const { sku } = await params;  // ← await params

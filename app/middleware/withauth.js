@@ -1,21 +1,18 @@
-// app/middleware/withAuth.js
-import { getToken } from "next-auth/jwt";
-import { NextResponse } from "next/server";
+// middleware/auth.js
+import { NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-export async function middleware(request) {
-  const token = await getToken({
-    req: request,
-    secret: process.env.NEXTAUTH_SECRET
-  });
-
+export async function withStoreAuth(req) {
+  const token = await getToken({ req });
+  
   if (!token?.storeId) {
     return NextResponse.json(
-      { error: "Authentication required" },
+      { error: 'Unauthorized' },
       { status: 401 }
     );
   }
 
-  const requestHeaders = new Headers(request.headers);
+  const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-store-id', token.storeId);
 
   return NextResponse.next({
@@ -24,7 +21,3 @@ export async function middleware(request) {
     }
   });
 }
-
-export const config = {
-  matcher: ['/api/items/:path*', '/dashboard/:path*']
-};
