@@ -6,6 +6,8 @@ import InventoryTable from '../components/InventoryTable';
 import AddItemForm from '../components/AddItemForm';
 import { Suspense } from 'react';
 import LoadingSkeleton from '../components/Loadingskeleton';
+import { redirect } from 'next/navigation';
+
 
 export default function Home() {
   const [items, setItems] = useState([]);
