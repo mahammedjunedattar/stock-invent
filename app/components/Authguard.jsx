@@ -1,4 +1,8 @@
 'use client'
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+
 export default function AuthGuard({ children }) {
   const { status } = useSession();                       // Hook #1
   const router     = useRouter();                        // Hook #2
