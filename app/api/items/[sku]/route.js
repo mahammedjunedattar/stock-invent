@@ -4,7 +4,7 @@ import { connectToDB }     from '@/app/lib/db';
 import { validateItem }    from '@/app/models/item';
 import { getToken }        from 'next-auth/jwt';
 
-const SECRET = process.env.NEXTAUTH_SECRETS;
+const SECRET = process.env.NEXTAUTH_SECRET;
 
 // Helper: check auth & extract storeId
 async function requireStoreId(req) {
