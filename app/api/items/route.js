@@ -3,12 +3,17 @@ import { NextResponse } from 'next/server';
 import { validateItem } from '@/app/models/item';
 import { connectToDB } from '@/app/lib/db';
 import { getToken } from 'next-auth/jwt';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
 
 export async function GET(request) {
   try {
     const token = await getToken({ req: request });
+    const session = await getServerSession(authOptions);
+    console.log(session.user.storeId)
+
     
-    if (!token?.sub) {
+    if (!session.user.storeId) {
       return NextResponse.json(
         { error: 'Unauthorized - Missing store context' },
         { status: 401 }
@@ -19,7 +24,7 @@ export async function GET(request) {
     const items = await db
       .collection('items')
       .find(
-        { storeId: token.sub },
+        { storeId: session.user.storeId },
         { projection: { _id: 0, storeId: 0 } }
       )
       .sort({ lastUpdated: -1 })
@@ -40,8 +45,9 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const token = await getToken({ req: request });
-    
-    if (!token?.sub) {
+    const session = await getServerSession(authOptions);
+
+    if (!session.user.storeId) {
       return NextResponse.json(
         { error: 'Unauthorized - Missing store context' },
         { status: 401 }
@@ -55,7 +61,7 @@ export async function POST(request) {
     // Validate input with storeId
     const validation = validateItem({
       ...body,
-      storeId: token.sub
+      storeId: session.user.storeId
     });
 
     if (!validation.success) {
@@ -68,7 +74,7 @@ export async function POST(request) {
     // Check for existing SKU within this store
     const exists = await collection.findOne({
       sku: validation.data.sku,
-      storeId: token.sub
+      storeId: session.user.storeId
     });
 
     if (exists) {
@@ -81,7 +87,7 @@ export async function POST(request) {
     // Insert with validated data
     const result = await collection.insertOne({
       ...validation.data,
-      storeId: token.sub,
+      storeId: session.user.storeId,
       lastUpdated: new Date()
     });
 
