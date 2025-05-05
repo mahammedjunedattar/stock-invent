@@ -68,7 +68,7 @@ export const authOptions = {
 
   // JWT configuration
   jwt: {
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRETS,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
 
@@ -94,7 +94,7 @@ export const authOptions = {
   },
 
   // Security settings
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRETS,
   useSecureCookies: process.env.NODE_ENV === 'production',
   debug: process.env.NODE_ENV === 'development',
   trustHost: true
