@@ -7,7 +7,6 @@ import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import clientPromise from '@/app/lib/db';
 
-// Zod schema for credentials validation
 const credentialsSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -19,6 +18,15 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      profile(profile) {
+        return {
+          id: profile.sub,
+          email: profile.email,
+          name: profile.name,
+          storeId: null, // Initialize storeId for Google users
+          role: 'user'
+        };
+      }
     }),
     CredentialsProvider({
       id: 'credentials',
@@ -33,7 +41,7 @@ export const authOptions = {
           if (!parsed.success) return null;
           
           const client = await clientPromise;
-          const db = client.db(); // Make sure this matches your DB name
+          const db = client.db();
           
           const user = await db.collection('users').findOne({ 
             email: parsed.data.email.toLowerCase() 
@@ -47,11 +55,10 @@ export const authOptions = {
           return {
             id: user._id.toString(),
             email: user.email,
-            name: user.name || 'User', // Required field
-            storeId: user.storeId,
+            name: user.name || 'User',
+            storeId: user.storeId?.toString(), // Ensure string conversion
             role: user.role || 'user'
           };
-          
         } catch (error) {
           console.error('Auth error:', error);
           return null;
@@ -66,12 +73,14 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        token.sub = user.id; // Required for session management
         token.storeId = user.storeId;
         token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
+      session.user.id = token.sub; // Include user ID in session
       session.user.storeId = token.storeId;
       session.user.role = token.role;
       return session;
@@ -80,20 +89,23 @@ export const authOptions = {
   pages: {
     signIn: '/login',
     error: '/auth/error',
+    newUser: '/setup-store' // Add store setup flow
   },
-  secret: process.env.NEXTAUTH_SECRETS,
+  secret: process.env.NEXTAUTH_SECRET, // Corrected environment variable name
   cookies: {
     sessionToken: {
-      name: `next-auth.session-token`,
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         path: '/',
-        secure: process.env.NODE_ENV === 'production'
+        secure: process.env.NODE_ENV === 'production',
+        domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : undefined
       }
     }
   },
-  debug: process.env.NODE_ENV === 'development'
+  debug: process.env.NODE_ENV === 'development',
+  useSecureCookies: process.env.NODE_ENV === 'production'
 };
 
 const handler = NextAuth(authOptions);
