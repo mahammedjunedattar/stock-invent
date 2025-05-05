@@ -91,7 +91,7 @@ export const authOptions = {
     error: '/auth/error',
     newUser: '/setup-store' // Add store setup flow
   },
-  secret: process.env.NEXTAUTH_SECRET, // Corrected environment variable name
+  secret: process.env.NEXTAUTH_SECRETS, // Corrected environment variable name
   cookies: {
     sessionToken: {
       name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
@@ -100,7 +100,7 @@ export const authOptions = {
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : undefined
+        domain: process.env.NODE_ENV === 'production' ? '.https://stock-invent-mahammedjunedattars-projects.vercel.app' : undefined
       }
     }
   },
