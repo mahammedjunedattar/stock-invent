@@ -26,11 +26,7 @@ const fetchItems = async () => {
   }
 };
 useEffect(() => {
-  let user = localStorage.getItem('user')
-  console.log(user)
-  if(!user){
-    redirect('/login');
-  }
+
   (async () => {
     setLoading(true);
     const data = await fetchItems();
