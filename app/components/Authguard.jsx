@@ -8,7 +8,7 @@ export default function AuthGuard({ children }) {
   const router     = useRouter();                        // Hook #2
   const pathname   = usePathname();                      // Hook #3
 
-  const isPublic = ['/login','/signup'].includes(pathname);
+  const isPublic = ['/login','/'].includes(pathname);
 
   if (status === 'loading') {                            // Condition A
     return <div>Loading...</div>;
