@@ -1,38 +1,28 @@
-// components/AuthGuard.jsx
-'use client';
-import { useSession }     from 'next-auth/react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useEffect }      from 'react';
-
+'use client'
 export default function AuthGuard({ children }) {
-  const { status } = useSession();
-  const router     = useRouter();
-  const pathname   = usePathname();
+  const { status } = useSession();                       // Hook #1
+  const router     = useRouter();                        // Hook #2
+  const pathname   = usePathname();                      // Hook #3
 
-  // Define your public routes
-  const isPublic = ['/login', '/signup'].includes(pathname);
+  const isPublic = ['/login','/signup'].includes(pathname);
 
-  // If session is still loading, show loading
-  if (status === 'loading') {
+  if (status === 'loading') {                            // Condition A
     return <div>Loading...</div>;
   }
 
-  // If we’re on a public route, just render it
-  if (isPublic) {
+  if (isPublic) {                                        // Condition B
     return <>{children}</>;
   }
 
-  // At this point, status is either 'authenticated' or 'unauthenticated'
-  if (status === 'unauthenticated') {
-    // Redirect unauthenticated users from protected routes
-    useEffect(() => {
+  if (status === 'unauthenticated') {                    // Condition C
+    useEffect(() => {                                    // ❌ Hook #4 called inside a condition
       router.push('/login');
     }, [router]);
     return null;
   }
 
-  // Authenticated and not loading → render protected content
-  return <>{children}</>;
+  return <>{children}</>;                                // Default – authenticated
 }
+
 
 
