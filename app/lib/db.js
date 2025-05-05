@@ -42,7 +42,8 @@ if (!cached.clientPromise) {
  * A promise that resolves to a connected MongoClient.
  * Useful for libraries that need access to the client itself.
  */
-export const clientPromise = cached.clientPromise;
+ const clientPromise = cached.clientPromise;
+ export default clientPromise
 
 /**
  * Returns a connected { client, db } pair, caching both.
