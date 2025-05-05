@@ -21,11 +21,13 @@ export default function LoginPage() {
 // app/login/page.js
 const onSubmit = async (data) => {
   try {
-    const result = await signIn('credentials', {
-      redirect: false,
-      ...data
-    });
-    console.log(result)
+  e.preventDefault();
+  const result = await signIn('credentials', { // Match provider ID
+    redirect: false,
+    email: credentials.email,
+    password: credentials.password
+  });
+
 
     if (result?.error) {
       // Detailed error messages
