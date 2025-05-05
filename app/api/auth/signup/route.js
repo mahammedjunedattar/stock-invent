@@ -53,7 +53,7 @@ export async function POST(request) {
 
     });
 
-    response.headers.set('Access-Control-Allow-Origin', process.env.NEXTAUTH_URL);
+    response.headers.set('Access-Control-Allow-Origin', process.env.NEXTAUTH_URLS);
     response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type');
     
