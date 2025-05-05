@@ -1,18 +1,22 @@
 // app/api/items/[sku]/route.js
-import { NextResponse }    from 'next/server';
-import { connectToDB }     from '@/app/lib/db';
-import { validateItem }    from '@/app/models/item';
-import { getToken }        from 'next-auth/jwt';
+// app/api/items/[sku]/route.js
+import { NextResponse } from 'next/server';
+import { getToken }     from 'next-auth/jwt';
+import { connectToDB }  from '@/app/lib/db';
 
-const SECRET = process.env.NEXTAUTH_SECRET;
+const SECRET     = process.env.NEXTAUTH_SECRET;
+const COOKIE_DEV = 'next-auth.session-token';
+const COOKIE_PROD= '__Secure-next-auth.session-token';
 
-// Helper: check auth & extract storeId
 async function requireStoreId(req) {
-  const token = await getToken({ req, secret: SECRET });
-  if (!token?.storeId) {
-    return null;
-  }
-  return token.storeId;
+  const token = await getToken({
+    req,
+    secret: SECRET,
+    cookieName: process.env.NODE_ENV === 'production'
+      ? COOKIE_PROD
+      : COOKIE_DEV
+  });
+  return token?.storeId ?? null;
 }
 
 export async function GET(request, { params }) {
@@ -20,24 +24,13 @@ export async function GET(request, { params }) {
   if (!storeId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
-  try {
-    const { db } = await connectToDB();
-    const { sku } = params;
-    console.log(sku)
-
-    const item = await db
-      .collection('items')
-      .findOne({ sku, storeId }, { projection: { _id: 0, storeId: 0 } });
-
-    if (!item) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
-    }
-    return NextResponse.json(item);
-  } catch (err) {
-    console.error('GET Error:', err);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
-  }
+  const { db } = await connectToDB();
+  const item = await db
+    .collection('items')
+    .findOne({ sku: params.sku, storeId }, { projection: { _id: 0, storeId: 0 } });
+  return item
+    ? NextResponse.json(item)
+    : NextResponse.json({ error: 'Not found' }, { status: 404 });
 }
 
 export async function DELETE(request, { params }) {
