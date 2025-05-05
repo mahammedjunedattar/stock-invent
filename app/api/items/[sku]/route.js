@@ -43,7 +43,7 @@ export async function GET(request, { params }) {
 export async function DELETE(request, { params }) {
   const storeId = await requireStoreId(request);
   if (!storeId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorizeddddddddddd' }, { status: 401 });
   }
 
   try {
