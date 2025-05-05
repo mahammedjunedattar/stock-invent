@@ -13,6 +13,8 @@ const loginSchema = z.object({
 });
 
 export default function LoginPage() {
+    const [error,setError] =  useState('')
+
   const router = useRouter();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(loginSchema)
