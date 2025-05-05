@@ -1,55 +1,39 @@
-// app/login/page.js
 'use client';
-import { signIn } from 'next-auth/react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useState } from 'react';
-
+import { signIn }                      from 'next-auth/react';
+import { useForm }                     from 'react-hook-form';
+import { zodResolver }                 from '@hookform/resolvers/zod';
+import { z }                           from 'zod';
+import { useRouter }                   from 'next/navigation';
+import Link                           from 'next/link';
+import { useState }                   from 'react';
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6)
+  email:    z.string().email(),
+  password: z.string().min(6),
 });
 
 export default function LoginPage() {
-    const [error,setError] =  useState('')
-
   const router = useRouter();
+  const [error, setError] = useState('');
   const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: zodResolver(loginSchema)
+    resolver: zodResolver(loginSchema),
   });
 
-// app/login/page.js
-const onSubmit = async (data) => {
-  try {
-  e.preventDefault();
-  const result = await signIn('credentials', { // Match provider ID
-    redirect: false,
-    email: credentials.email,
-    password: credentials.password
-  });
-
+  // ← Accept `data` parameter here
+  const onSubmit = async (data) => {
+    const result = await signIn('credentials', {
+      redirect: false,
+      email: data.email,
+      password: data.password,
+    });
 
     if (result?.error) {
-      // Detailed error messages
-      let errorMessage = 'Login failed';
-      if (result.error.includes('CredentialsSignin')) {
-        errorMessage = 'Invalid email or password';
-      }
-      setError(errorMessage);
+      setError('Invalid email or password');
     } else {
-        localStorage.setItem('user',result.sub)
-
-      router.refresh();
       router.push('/Dashboard');
     }
-  } catch (error) {
-    setError('An unexpected error occurred');
-  }
-};
+  };
+
   return (
     <div className="max-w-md mx-auto mt-20 p-6 bg-white rounded shadow">
       <h1 className="text-2xl font-bold mb-6">Login</h1>
@@ -74,6 +58,8 @@ const onSubmit = async (data) => {
           {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
         </div>
 
+        {error && <p className="text-red-500 text-center">{error}</p>}
+
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
@@ -82,8 +68,8 @@ const onSubmit = async (data) => {
         </button>
         
         <div className="text-center mt-4">
-          Don't have an account?{' '}
-          <Link href="/signup" className="text-blue-600 hover:underline">
+          Don&apos;t have an account?{' '}
+          <Link href="/" className="text-blue-600 hover:underline">
             Sign Up
           </Link>
         </div>
@@ -91,3 +77,4 @@ const onSubmit = async (data) => {
     </div>
   );
 }
+
