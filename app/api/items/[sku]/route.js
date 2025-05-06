@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 import { getToken }     from 'next-auth/jwt';
 import { connectToDB }  from '@/app/lib/db';
 
-const SECRET     = process.env.NEXTAUTH_SECRETS;
+const SECRET     = process.env.NEXTAUTH_SECRET;
 const COOKIE_DEV = 'next-auth.session-token';
 const COOKIE_PROD= '__Secure-next-auth.session-token';
 
