@@ -3,8 +3,8 @@
 import { NextResponse } from 'next/server';
 import { getToken }     from 'next-auth/jwt';
 import { connectToDB }  from '@/app/lib/db';
-
-const SECRET     = process.env.NEXTAUTH_SECRET;
+import { validateItem } from '@/app/models/item';
+const SECRET     = process.env.NEXTAUTH_SECRETS;
 const COOKIE_DEV = 'next-auth.session-token';
 const COOKIE_PROD= '__Secure-next-auth.session-token';
 
@@ -18,7 +18,6 @@ async function requireStoreId(req) {
   });
   return token?.storeId ?? null;
 }
-
 export async function GET(request, { params }) {
   const storeId = await requireStoreId(request);
   if (!storeId) {
@@ -35,6 +34,8 @@ export async function GET(request, { params }) {
 
 export async function DELETE(request, { params }) {
   const storeId = await requireStoreId(request);
+  console.log(storeId)
+
   if (!storeId) {
     return NextResponse.json({ error: 'Unauthorizeddddddddddd' }, { status: 401 });
   }
@@ -82,5 +83,6 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
+
 
 
