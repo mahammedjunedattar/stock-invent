@@ -4,26 +4,8 @@ import { NextResponse } from 'next/server';
 import { getToken }     from 'next-auth/jwt';
 import { connectToDB }  from '@/app/lib/db';
 
-const SECRET     = process.env.NEXTAUTH_SECRETS;
-const COOKIE_DEV = 'next-auth.session-token';
-const COOKIE_PROD= '__Secure-next-auth.session-token';
-
-async function requireStoreId(req) {
-  const token = await getToken({
-    req,
-    secret: SECRET,
-    cookieName: process.env.NODE_ENV === 'production'
-      ? COOKIE_PROD
-      : COOKIE_DEV
-  });
-  return token?.storeId ?? null;
-}
 
 export async function GET(request, { params }) {
-  const storeId = await requireStoreId(request);
-  if (!storeId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
   const { db } = await connectToDB();
   const item = await db
     .collection('items')
@@ -34,10 +16,6 @@ export async function GET(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-  const storeId = await requireStoreId(request);
-  if (!storeId) {
-    return NextResponse.json({ error: 'Unauthorizeddddddddddd' }, { status: 401 });
-  }
 
   try {
     const { db } = await connectToDB();
@@ -55,10 +33,6 @@ export async function DELETE(request, { params }) {
 }
 
 export async function PUT(request, { params }) {
-  const storeId = await requireStoreId(request);
-  if (!storeId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
 
   try {
     const body = await request.json();
