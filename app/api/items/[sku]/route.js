@@ -6,7 +6,7 @@ import { connectToDB }  from '@/app/lib/db';
 import { validateItem } from '@/app/models/item';
 const SECRET     = process.env.NEXTAUTH_SECRETS;
 const COOKIE_DEV = 'next-auth.session-token';
-const COOKIE_PROD= '__Secure-next-auth.session-token';
+const COOKIE_PROD= 'next-auth.session-token';
 
 async function requireStoreId(req) {
   const token = await getToken({
@@ -16,6 +16,7 @@ async function requireStoreId(req) {
       ? COOKIE_PROD
       : COOKIE_DEV
   });
+  console.log(token)
   return token?.storeId ?? null;
 }
 export async function GET(request, { params }) {
@@ -83,6 +84,7 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
+
 
 
 
